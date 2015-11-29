@@ -29,19 +29,27 @@ public:
 	*/
 	char traverseTree(BTNode<char>*& local_root, string& path, const int& pos)
 	{
+		// if a null is found throw error
+		if (local_root == NULL)
+		{
+			throw exception("Code is too long for this representation of Morse Code");
+		} // end if
+
+		// if found end of path return data
 		if(pos == path.length())
 		{
 			return local_root->data;
 		} // end if
 
+		// go left if '.' right if '_'
 		if(path[pos] == '.')
 		{
-				return traverseTree(local_root->left, path, pos + 1);
+			return traverseTree(local_root->left, path, pos + 1);
 		}
 		else
 		{
 			return traverseTree(local_root->right, path, pos + 1);
-		}
+		} // end if
 	} // end traverseTree
 
 	/** calls traversTree
@@ -70,8 +78,11 @@ public:
 		// loops through the message to parse the data by finding all the spaces
 		while(spaceLocation <= message.find_last_of(' '))
 		{
+			// finds a space's location
 			spaceLocation = message.find(' ', spaceLocation + 1);
+			// passes a substring from first nonspace to just before space, into traverse and gets result
 			result += traverse(message.substr(i, spaceLocation - i));
+			// moves i to spaceLocation
 			i = spaceLocation;
 			i++;		
 		} // end loop
@@ -79,13 +90,89 @@ public:
 		return result;
 	} // end decode
 
+	/** finds a letter in the Morse code tree
+	@param input is the character to be found
+	@param morse is Morse code string
+	returns Morse code string representation
+	*/
+	void findChar(BTNode<char>*& local_root, char input, string morse, string& answer)
+	{
+		// if a null is found return;
+		if (local_root == NULL)
+		{
+			return;
+		} // end if
+
+		// returns if an answer has been found
+		if(answer != "")
+		{
+			return;
+		} // end if
+
+		// sets the answer and returns
+		if(input == local_root->data)
+		{
+			answer = morse;
+			return;
+		} // end if
+
+		// adds a dot to the string and passes it to the left subtree
+		string temp = morse + '.';
+		findChar(local_root->left, input, temp, answer);
+
+		// resets temp
+		temp = "";
+
+		// adds a dash to the string and passes it to the right subtree
+		temp = morse + '_';
+		findChar(local_root->right, input, temp, answer);
+	} // end find
+
+	/** calls findChar
+	@param input is the character to be found
+	returns Morse code string representation
+	*/
+	string find(char input)
+	{
+		// holder for answer
+		string answer = "";
+
+		// passes character into findChar
+		findChar(root, input, "", answer);
+
+		// if answer not found throw error
+		if(answer == "")
+		{
+			throw exception("Letter not in the tree");
+		} // end if
+
+		return answer;
+	} // end find
+
 	/** encodes a message into Morse code
 	@param input holds the data from the caller function that is to be converted
 	returns final Morse code string
 	*/
 	string encode(string input)
 	{
-		//find();
+		// holder for the result
+		string result = "";
+
+		// loops through the input passing each character to get
+		// Morse code representation
+		for(size_t i = 0; i < input.length(); i++)
+		{
+			// finds Morse code represntation and adds it to the string
+			result += find(input[i]);
+
+			// places a space between each character of Morse code
+			if(i != input.length() - 1)
+			{
+				result += ' ';
+			} // end if
+		} // end loop
+
+		return result;
 	} // end encode
 private:
 	/** Builds the tree from a predetermined file
@@ -115,6 +202,7 @@ private:
 			// tests if correct number of letters or not
 			if(count != 26)
 			{
+				// if too few or too many letters throws error
 				if(count < 26)
 				{
 					throw exception("Too few entries in file");
@@ -143,8 +231,10 @@ private:
 		// holder for error
 		bool errorNotFound = true;
 
+		// inserts letter, if successful no error thrown
 		errorNotFound = insert(root, letter, path, 0);
 
+		// if unsuccessful insertion throw error
 		if(!errorNotFound)
 		{
 			throw exception("Error building tree from file");
@@ -160,6 +250,7 @@ private:
 	*/
 	bool insert(BTNode<char>*& local_root, const char& item, const string& path, const int& pos)
 	{
+		// if local_root is null isert node, else traverse tree
 		if (local_root == NULL)
 		{
 			local_root = new BTNode<char>(item);
@@ -167,6 +258,7 @@ private:
 		}
 		else
 		{
+			// if '.' go left, if '_' go right, else return fail status
 			if (path[pos] == '.')
 			{
 				return insert(local_root->left, item, path, pos + 1);
