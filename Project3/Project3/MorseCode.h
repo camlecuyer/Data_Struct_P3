@@ -22,20 +22,70 @@ public:
 		buildTree();
 	} // end build
 
+	/** traverses the tree by following the path from input
+	@param path passed from caller defines the path to the letter
+	@param pos is the position in the path
+	returns the letter at the end of the path
+	*/
+	char traverseTree(BTNode<char>*& local_root, string& path, const int& pos)
+	{
+		if(pos == path.length())
+		{
+			return local_root->data;
+		} // end if
+
+		if(path[pos] == '.')
+		{
+				return traverseTree(local_root->left, path, pos + 1);
+		}
+		else
+		{
+			return traverseTree(local_root->right, path, pos + 1);
+		}
+	} // end traverseTree
+
+	/** calls traversTree
+	@param path passed from caller defines the path to the letter
+	returns the letter at the end of the path
+	*/
+	char traverse(string path)
+	{
+		return traverseTree(this->root, path, 0);
+
+	} // end traverse
+
 	/** decode a message that was input using Morse code
 	@param message holds the data from the caller function, in the correct format
+	returns decoded string message
 	*/
 	string decode(string message)
 	{
-		//find();
+		// holds location of a space
+		size_t spaceLocation = 0;
+		// used to parse substring data
+		size_t i = 0;
+		// holds result
+		string result = "";
+
+		// loops through the message to parse the data by finding all the spaces
+		while(spaceLocation <= message.find_last_of(' '))
+		{
+			spaceLocation = message.find(' ', spaceLocation + 1);
+			result += traverse(message.substr(i, spaceLocation - i));
+			i = spaceLocation;
+			i++;		
+		} // end loop
+
+		return result;
 	} // end decode
 
 	/** encodes a message into Morse code
 	@param input holds the data from the caller function that is to be converted
+	returns final Morse code string
 	*/
 	string encode(string input)
 	{
-		//traverse();
+		//find();
 	} // end encode
 private:
 	/** Builds the tree from a predetermined file
@@ -89,22 +139,9 @@ private:
 		// holds letter from file
 		char letter = input[0];
 		// holds path to place letter
-		string path = "";
+		string path = input.erase(0,1);
 		// holder for error
 		bool errorNotFound = true;
-
-		// transforms symobls to 1 or 0 for easier parsing
-		for(size_t i = 1; i < input.length(); i++)
-		{
-			if(input[i] == '.')
-			{
-				path += '0';
-			}
-			else
-			{
-				path += '1';
-			} // end if
-		} // end loop
 
 		errorNotFound = insert(root, letter, path, 0);
 
@@ -121,7 +158,7 @@ private:
 	@param pos is where on the path the program currently is
 	returns if successfully placed the data or not
 	*/
-	bool insert(BTNode<char>*& local_root,const char& item, const string& path, const int& pos)
+	bool insert(BTNode<char>*& local_root, const char& item, const string& path, const int& pos)
 	{
 		if (local_root == NULL)
 		{
@@ -130,12 +167,18 @@ private:
 		}
 		else
 		{
-			if (path[pos] == '0')
+			if (path[pos] == '.')
+			{
 				return insert(local_root->left, item, path, pos + 1);
-			else if (path[pos] == '1')
+			}
+			else if (path[pos] == '_')
+			{
 				return insert(local_root->right, item, path, pos + 1);
+			}
 			else
+			{
 				return false;
+			} // end if
 		} // end if
 	} // end insert
 }; // end class MorseCode
