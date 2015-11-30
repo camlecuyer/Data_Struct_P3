@@ -22,6 +22,54 @@ public:
 		buildTree();
 	} // end build
 
+	/** Removes leading and trailing whitespace and extra white spaces
+	@param input is the input string passed from caller
+	*/
+	string removeWhiteSpace(string input)
+	{
+		// temp variable for whitespace adjustment
+		string temp = "";
+		// removes leading whitespace
+		input = input.erase(0, input.find_first_not_of(" "));
+		// removes trailing whitespace
+		input = input.erase(input.find_last_not_of(" ") + 1);
+
+		// control flag for loop
+		size_t i = 0;
+		// bool determines if a space is already found
+		// so that additional spaces can be removed
+		bool spaceFound = false;
+
+		// loops through input to removes unneccessary spaces
+		while(i < input.length())
+		{
+			// if a space is found enter inner if
+			// else add to temp
+			if(input[i] == ' ')
+			{
+				// if no space found add the space to temp and 
+				//set spaceFound to true to remove additional spaces
+				if(!spaceFound)
+				{
+					temp += input[i];
+					spaceFound = true;
+				} // end if
+			}
+			else
+			{
+				// if a non-space is found set spaceFound to false and
+				// add char to temp
+				spaceFound = false;
+				temp += input[i];
+			} // end if
+
+			i++; // increment control flag
+		} // end loop
+	
+		// return the reduced string
+		return temp;
+	} // end removeWhiteSpace
+
 	/** traverses the tree by following the path from input
 	@param path passed from caller defines the path to the letter
 	@param pos is the position in the path
@@ -68,6 +116,9 @@ public:
 	*/
 	string decode(string message)
 	{
+		// removes unnecessary white space
+		message = removeWhiteSpace(message);
+
 		// holds location of a space
 		size_t spaceLocation = 0;
 		// used to parse substring data
@@ -155,6 +206,15 @@ public:
 	*/
 	string encode(string input)
 	{
+		// removes unnecessary white space
+		input = removeWhiteSpace(input);
+
+		// changes word to all lowercase
+		for(size_t i = 0; i < input.length(); i++)
+		{
+			input[i] = tolower(input[i]);
+		} // end loop
+
 		// holder for the result
 		string result = "";
 
