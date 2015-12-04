@@ -277,6 +277,8 @@ private:
 		{
 			throw exception("Unable to open file");
 		} // end if
+
+		morseFile.close();
 	} // end buildTree
 
 	/** parses input data for use in the tree
